@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>清初三大儒｜互動學習網頁</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/noto-serif-sc@latest/chinese-serif-400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/noto-serif-sc@latest/chinese-serif-600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/css/noto-serif-sc@latest/chinese-serif-900.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --ink:#26221c; --paper:#f6f1e6; --paper2:#efe7d6;
+    --gu:#b3341f; --huang:#2f4b8f; --wang:#2f6b4f; --gold:#a9761c;
+  }
+  html{scroll-behavior:smooth; scroll-padding-top:84px;}
+  body{
+    font-family:'Noto Serif SC','Songti TC','PMingLiU',serif;
+    background:var(--paper); color:var(--ink);
+    background-image:radial-gradient(rgba(120,100,60,.06) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .seal{
+    display:inline-flex; align-items:center; justify-content:center;
+    background:#b3341f; color:#fff7ea; writing-mode:vertical-rl;
+    font-weight:900; letter-spacing:.15em; border-radius:6px;
+    box-shadow:2px 3px 0 rgba(0,0,0,.25);
+  }
+  .v-text{writing-mode:vertical-rl; letter-spacing:.35em;}
+  .acc-body{display:grid; grid-template-rows:0fr; transition:grid-template-rows .55s ease;}
+  .acc-body>div{overflow:hidden;}
+  .acc.open .acc-body{grid-template-rows:1fr;}
+  .acc .chev{transition:transform .4s;}
+  .acc.open .chev{transform:rotate(180deg);}
+  .flip{perspective:1200px;}
+  .flip-inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .7s cubic-bezier(.4,.2,.2,1);}
+  .flip.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;}
+  .flip-back{transform:rotateY(180deg);}
+  .reveal{opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s ease;}
+  .reveal.on{opacity:1; transform:none;}
+  .quote-box{border-left:4px solid var(--gold); background:rgba(169,118,28,.07);}
+  .star-note{background:rgba(179,52,31,.08); border:1px dashed rgba(179,52,31,.5);}
+  .classical{line-height:2.1; text-align:justify;}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:#c9b98f;border-radius:8px}
+  .tab-gu.active{background:var(--gu); color:#fff;}
+  .tab-huang.active{background:var(--huang); color:#fff;}
+  .tab-wang.active{background:var(--wang); color:#fff;}
+  .opt-btn{transition:all .25s;}
+  .opt-btn:not(:disabled):hover{transform:translateX(6px);}
+  .opt-correct{background:#e5f3ea !important; border-color:#2f6b4f !important; color:#1d4a36;}
+  .opt-wrong{background:#f9e7e2 !important; border-color:#b3341f !important; color:#7c2415;}
+  .tl-dot{box-shadow:0 0 0 4px var(--paper), 0 0 0 6px currentColor;}
+  .nav-link{position:relative;}
+  .nav-link::after{content:""; position:absolute; left:0; right:100%; bottom:-4px; height:2px; background:var(--gold); transition:right .3s;}
+  .nav-link:hover::after,.nav-link.act::after{right:0;}
+  .brush-title{position:relative; display:inline-block;}
+  .brush-title::before{content:""; position:absolute; inset:auto -8px -6px -8px; height:10px; background:rgba(169,118,28,.35); transform:skewX(-12deg); z-index:-1;}
+  @keyframes floatIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .panel-anim{animation:floatIn .5s ease both;}
+  .mode-btn{padding:.4rem 1.1rem; border-radius:9999px; border:1px solid #d8c9a5; font-size:.875rem; font-weight:700; color:#78716c; background:#fff; transition:all .2s;}
+  .mode-btn:hover{border-color:#26221c; color:#26221c;}
+  .mode-btn.active{background:#26221c; color:#f6f1e6; border-color:#26221c;}
+  .orig-view{background:#faf7ef; border:1px solid #e5dcc6;}
+  .trans-view{background:#eef4ec; border:1px solid #c8dcc4;}
+  .trans-badge{display:inline-block; font-size:.72rem; letter-spacing:.2em; padding:.15rem .6rem; border-radius:4px; font-weight:700;}
+  .text-view{transition:opacity .35s ease;}
+</style>
+</head>
+<body class="antialiased">
+
+<div id="progressBar" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-amber-600 via-red-700 to-amber-600 z-[60]" style="width:0%"></div>
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#f6f1e6]/90 backdrop-blur border-b border-[#d8c9a5]">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+    <a href="#hero" class="flex items-center gap-2 shrink-0">
+      <span class="seal text-sm px-1.5 py-2" style="writing-mode:horizontal-tb;">三大儒</span>
+      <span class="font-black text-lg tracking-widest hidden sm:inline">清初三大儒・互動學習</span>
+    </a>
+    <nav class="flex items-center gap-4 sm:gap-6 text-sm sm:text-base overflow-x-auto whitespace-nowrap py-2">
+      <a class="nav-link" href="#overview">概覽</a>
+      <a class="nav-link" href="#scholars">三大儒</a>
+      <a class="nav-link" href="#timeline">時間軸</a>
+      <a class="nav-link" href="#compare">對照</a>
+      <a class="nav-link" href="#texts">選讀</a>
+      <a class="nav-link" href="#cards">卡篇</a>
+      <a class="nav-link" href="#quiz">測驗</a>
+    </nav>
+  </div>
+</header>
+
+<section id="hero" class="pt-16 relative overflow-hidden">
+  <div class="max-w-6xl mx-auto px-4 pt-10 pb-6 grid md:grid-cols-[1fr_auto] gap-6 items-center">
+    <div class="reveal on">
+      <p class="text-sm tracking-[.4em] text-[#a9761c] font-semibold mb-3">國文互動學習・明清文學專題</p>
+      <h1 class="text-4xl sm:text-6xl font-black tracking-wide leading-tight">清初三大儒</h1>
+      <p class="mt-3 text-xl sm:text-2xl text-stone-700 tracking-widest">顧炎武 ・ 黃宗羲 ・ 王夫之</p>
+      <div class="mt-5 flex flex-wrap gap-2 text-sm">
+        <span class="px-3 py-1 border border-[#b3341f] text-[#b3341f] rounded-full">遺民作家</span>
+        <span class="px-3 py-1 border border-[#2f4b8f] text-[#2f4b8f] rounded-full">民族意識</span>
+        <span class="px-3 py-1 border border-[#2f6b4f] text-[#2f6b4f] rounded-full">經世致用</span>
+      </div>
+      <div class="mt-6 flex gap-3 flex-wrap">
+        <a href="#scholars" class="px-5 py-2.5 bg-[#26221c] text-[#f6f1e6] rounded shadow hover:bg-black transition">開始學習</a>
+        <a href="#texts" class="px-5 py-2.5 border-2 border-[#a9761c] text-[#a9761c] rounded hover:bg-[#a9761c] hover:text-white transition">選讀文本・原文＋白話</a>
+        <a href="#quiz" class="px-5 py-2.5 border-2 border-[#26221c] rounded hover:bg-[#26221c] hover:text-[#f6f1e6] transition">挑戰測驗</a>
+      </div>
+    </div>
+    <div class="seal text-2xl px-3 py-5 hidden md:inline-flex">遺民</div>
+  </div>
+  <div class="max-w-6xl mx-auto px-4 pb-10 reveal on">
+    <div class="rounded-xl overflow-hidden border-4 border-[#26221c] shadow-[8px_8px_0_rgba(38,34,28,.25)]">
+      <img src="https://image.qwenlm.ai/public_source/7e5d093f-2f9e-4bef-8d81-a1a44f29d9b4/17ca43885-c732-4fe2-b6f6-a43744655fd4.png" alt="書齋圖：線裝書、毛筆、硯臺與茶盞" class="w-full h-64 sm:h-96 object-cover">
+    </div>
+    <p class="text-center text-xs text-stone-500 mt-2 tracking-widest">書齋清供・讀史研經之意象</p>
+  </div>
+</section>
+
+<!-- 概覽 -->
+<section id="overview" class="py-14 bg-[#efe7d6] border-y border-[#d8c9a5]">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-black mb-8 reveal"><span class="brush-title">壹・概覽：遺民與實學</span></h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="reveal bg-white/70 rounded-xl p-6 border-t-4 border-[#b3341f] shadow">
+        <h3 class="text-xl font-bold mb-3 text-[#b3341f]">⚫ 遺民作家，擁有強烈的民族意識</h3>
+        <p class="leading-8 text-justify">顧炎武、黃宗羲、王夫之都是橫跨明清兩代、堅持不在清廷擔任官職的「遺民」作家，他們三位都是知名的經濟家、思想家、史學家，也非常擅長詩文創作。清初三大儒擁有強烈的民族意識，相當關心現實社會。</p>
+      </div>
+      <div class="reveal bg-white/70 rounded-xl p-6 border-t-4 border-[#2f6b4f] shadow">
+        <h3 class="text-xl font-bold mb-3 text-[#2f6b4f]">⚫ 主張「經世致用」之學</h3>
+        <p class="leading-8 text-justify">清初三大儒共同的主張是「經世致用」（治理世事，切合實用），作品以「史論」、「雜說」、「傳記」為主，亦有許多序、記。題材切近現實，語言質樸，風格剛健渾厚。</p>
+      </div>
+    </div>
+    <div class="grid sm:grid-cols-3 gap-4 mt-8">
+      <button onclick="openScholar('gu')" class="reveal group text-left rounded-xl p-5 bg-white/80 border-l-8 border-[#b3341f] shadow hover:-translate-y-1 transition">
+        <p class="text-2xl font-black text-[#b3341f]">顧炎武</p>
+        <p class="text-sm text-stone-500 mt-1">1613–1682・號亭林・崑山人</p>
+        <p class="mt-3 text-sm leading-6">《日知錄》・「明道救世」・樸學先聲</p>
+        <p class="mt-3 text-xs text-[#b3341f] group-hover:underline">點此前往人物專頁 →</p>
+      </button>
+      <button onclick="openScholar('huang')" class="reveal group text-left rounded-xl p-5 bg-white/80 border-l-8 border-[#2f4b8f] shadow hover:-translate-y-1 transition">
+        <p class="text-2xl font-black text-[#2f4b8f]">黃宗羲</p>
+        <p class="text-sm text-stone-500 mt-1">1610–1695・號梨洲・餘姚人</p>
+        <p class="mt-3 text-sm leading-6">《明夷待訪錄》・民本思想・「黃宗羲定律」</p>
+        <p class="mt-3 text-xs text-[#2f4b8f] group-hover:underline">點此前往人物專頁 →</p>
+      </button>
+      <button onclick="openScholar('wang')" class="reveal group text-left rounded-xl p-5 bg-white/80 border-l-8 border-[#2f6b4f] shadow hover:-translate-y-1 transition">
+        <p class="text-2xl font-black text-[#2f6b4f]">王夫之</p>
+        <p class="text-sm text-stone-500 mt-1">1619–1692・船山先生・衡州人</p>
+        <p class="mt-3 text-sm leading-6">《讀通鑑論》・推崇張載・「以意為主」</p>
+        <p class="mt-3 text-xs text-[#2f6b4f] group-hover:underline">點此前往人物專頁 →</p>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 三大儒 -->
+<section id="scholars" class="py-14">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-black mb-8 reveal"><span class="brush-title">貳・三大儒：生平與文學觀</span></h2>
+
+    <div class="flex flex-wrap gap-3 mb-8 reveal">
+      <button class="scholar-tab tab-gu active px-6 py-3 rounded-full border-2 border-[#b3341f] font-bold text-[#b3341f] transition" data-s="gu">顧炎武</button>
+      <button class="scholar-tab tab-huang px-6 py-3 rounded-full border-2 border-[#2f4b8f] font-bold text-[#2f4b8f] transition" data-s="huang">黃宗羲</button>
+      <button class="scholar-tab tab-wang px-6 py-3 rounded-full border-2 border-[#2f6b4f] font-bold text-[#2f6b4f] transition" data-s="wang">王夫之</button>
+    </div>
+
+    <!-- 顧炎武 -->
+    <div id="panel-gu" class="scholar-panel panel-anim grid lg:grid-cols-2 gap-8">
+      <div class="bg-white/80 rounded-xl p-6 shadow border-t-8 border-[#b3341f]">
+        <div class="flex items-baseline justify-between flex-wrap gap-2">
+          <h3 class="text-2xl font-black text-[#b3341f]">顧炎武（1613–1682）</h3>
+          <span class="text-sm text-stone-500">原名絳，字忠清；明亡改名炎武，字寧人，號亭林，晚年化名「蔣山傭」。崑山人。</span>
+        </div>
+        <h4 class="mt-5 mb-3 font-bold tracking-widest text-stone-600">（一）生平</h4>
+        <ol class="space-y-4 border-l-2 border-[#b3341f]/40 pl-6 text-justify leading-7">
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#b3341f] text-[#b3341f]"></span>清兵入關後隱居語濂涇，後由崑山縣令楊永言之薦投入南明朝廷，任兵部司務，撰《軍制論》《形勢論》《田功論》《錢法論》。清軍攻陷南京後轉投王永祚義軍，又與歸莊聯合吳志葵、魯之嶼軍隊欲解崑山之圍，終至功敗垂成。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#b3341f] text-[#b3341f]"></span>生母何氏遭清軍斷去右臂，兩位弟弟被殺；嗣母王氏絕食而亡，遺命顧炎武終身不得事清。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#b3341f] text-[#b3341f]"></span>惡僕陸恩勾結土豪葉方恆，欲告發其通海謀反。炎武一怒將陸恩溺斃，因而入獄，幸賴友人路澤博相救，以「殺有罪奴」結案。出獄後仇人追殺至南京；次年返鄉變賣家產，從此北上，一去不返。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#b3341f] text-[#b3341f]"></span>北上考察山川形勢，聯結反清人士，遍歷山東、山西、河南、河北、陝西等地。又因山東萊州黃培詩案入獄，得友人李因篤等營救出獄。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#b3341f] text-[#b3341f]"></span>康熙帝師熊賜履設宴邀修《明史》，炎武拒絕：「果有此舉，不為介之推逃，則為屈原之死矣！」</li>
+        </ol>
+      </div>
+      <div class="space-y-4">
+        <h4 class="font-bold tracking-widest text-stone-600">（二）文學觀（點按展開原文）</h4>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#b3341f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">1. 求學為「明道救世」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「君子為學，以明道也，以救世也。徒以詩文而已，所謂雕蟲篆刻，亦何益哉？」（〈與人書二十五〉）</p>
+            <p class="star-note p-3 text-sm">★ 對純文學創作有所批判。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#b3341f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">2. 反對宋明理學空談「心、理、性、命」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「百餘年以來之為學者，往往言心言性，而茫乎不得其解也。」（〈與友人論學書〉）</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#b3341f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">3. 提倡「經世致用」，強調「實學」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「感四國之多虞，恥經生之寡術，於是歷覽二十一史以及天下郡縣志書，一代名公文集及章奏文冊之類，有得即錄，共成四十餘帙。一為輿地之記，一為利病之書。」（〈天下郡國利病書序〉）</p>
+            <p class="star-note p-3 text-sm">★ 根據當代社會的需求，有很強的現實針對性。為清代「樸學」、「漢學」之先聲。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#b3341f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">4. 痛批時文之弊，反對摹仿，提倡獨創<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="text-sm text-stone-600">→ 反對前後七子的「擬古」。</p>
+            <p class="quote-box p-4 text-sm leading-7">「欲振今日之文，在毌拘之以格式，而俊異之才出矣。」（《日知錄》卷十六〈程文〉）</p>
+            <p class="quote-box p-4 text-sm leading-7">「近代文章之弊，全在摹仿，即使逼肖古人，已非極詣，況遺其神理而得其皮毛者乎？」（《日知錄》卷十九〈文人摹仿之病〉）</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#b3341f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">5. 否定晚明抒發性靈的文學流派<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「自古以來，小人之無忌憚而敢於叛聖人者，莫甚於李贄，然雖奉嚴旨，而其書之行於人間自若也。」（《日知錄卷十八‧李贄》）<span class="text-[#b3341f] font-bold">★ 批評李贄</span></p>
+            <p class="quote-box p-4 text-sm leading-7">「已而評《左傳》，評《史記》，評《毛詩》，好行小慧，自立新說，天下之士靡然從之。……其罪雖不及李贄，然亦敗壞天下之一人。」（《日知錄卷十八‧鍾惺》）<span class="text-[#b3341f] font-bold">★ 批評「竟陵派」領袖鍾惺</span></p>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 黃宗羲 -->
+    <div id="panel-huang" class="scholar-panel hidden grid lg:grid-cols-2 gap-8">
+      <div class="bg-white/80 rounded-xl p-6 shadow border-t-8 border-[#2f4b8f]">
+        <div class="flex items-baseline justify-between flex-wrap gap-2">
+          <h3 class="text-2xl font-black text-[#2f4b8f]">黃宗羲（1610–1695）</h3>
+          <span class="text-sm text-stone-500">字太沖，號南雷，又號梨洲。餘姚人。</span>
+        </div>
+        <h4 class="mt-5 mb-3 font-bold tracking-widest text-stone-600">（一）生平</h4>
+        <ol class="space-y-4 border-l-2 border-[#2f4b8f]/40 pl-6 text-justify leading-7">
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#2f4b8f] text-[#2f4b8f]"></span>其父黃尊素為東林黨骨幹之一，被閹黨殘害而死。黃宗羲曾為父報仇。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#2f4b8f] text-[#2f4b8f]"></span>清兵南下後，加入魯王監國政權進行抗清運動。後因母親被清廷拘捕，只好返鄉歸隱，講學著述。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#2f4b8f] text-[#2f4b8f]"></span>康熙時曾以「博學鴻詞」相招，又想延攬其入史局，皆堅辭不就。</li>
+        </ol>
+        <div class="mt-6 p-4 rounded-lg bg-[#2f4b8f]/10 border border-[#2f4b8f]/30 text-sm leading-7">
+          <p class="font-bold text-[#2f4b8f] mb-1">補充：黃宗羲定律</p>
+          中國歷朝歷代都有進行賦稅改革，改革目的主要是減輕農民負擔、改善國家財政；每次稅賦改革後，農民負擔在短時間內確實有下降，但隨後又增長到比改革前更高的水平，國家財政最後也得不到改善。黃宗羲稱之為「積累莫返之害」，清華大學秦暉將此現象總結並命名為「黃宗羲定律」（《明夷待訪錄‧田制三》）。
+        </div>
+      </div>
+      <div class="space-y-4">
+        <h4 class="font-bold tracking-widest text-stone-600">（二）文學觀（點按展開原文）</h4>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f4b8f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">1. 極力推揚「王學」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「於是陽明先生者出。以心學教天下，示之作聖之路，馬醫夏畦，皆可反身認取，步趨唯諾，無非大和真覺，聖人去人不遠。」（〈餘姚縣重修儒學記〉）</p>
+            <p class="star-note p-3 text-sm">★ 極力鼓吹王陽明對儒學的貢獻。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f4b8f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">2.《明夷待訪錄》：民主、民本思想<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「古者以天下為主，君為客，凡君之所畢世而經營者，為天下也。今也以君為主，天下為客，凡天下之無地而得安寧者，為君也。」（《明夷待訪錄‧原君》）</p>
+            <p class="star-note p-3 text-sm">★ 民貴君輕、社稷為重的思想。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f4b8f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">3. 強調情感在文學創作中的作用<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「文以理為主，然而情不至，則亦理之郛廓耳。廬陵之志交友，無不嗚咽；子厚之言身世，莫不淒愴；郝陵川之處真州，戴剡源之入故都，其言皆能惻惻動人。古今自有一種文章，不可磨滅，真是天若有情天亦老者。而世不乏堂堂之陣，正正之旗，皆以大文目之。顧其中無可以移人之情者，所謂刳然無物者也。」（〈論文管見〉）</p>
+            <p class="star-note p-3 text-sm">★ 情感具有決定性的作用。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f4b8f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">4.「文以載道」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「周元公曰：『文所以載道也。』今人無道可載，徒欲激昂於篇章字句之間，組織紉綴以求勝，是空無一物而飾其舟車也。故雖大輅艅艎，終為虛器而已矣。」（〈陳葵獻《偶刻詩文》序〉）</p>
+            <p class="star-note p-3 text-sm">★ 與顧炎武相同，要求回歸到「文以載道」的目標上。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f4b8f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">5. 傳狀碑誌注重「事功節義」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「敬亭既在軍中久，其豪滑大俠殺人亡命流離遇合破家失國之事，無不身親見之。且五方土音，鄉俗好尚，習見習聞。每發一聲，使人聞之，或如刀劍鐵騎，颯然浮空，或如風號雨泣，鳥悲獸駭，亡國之恨頓生，檀板之聲無色，有非莫生之言可盡者矣。」（〈柳敬亭傳〉）</p>
+            <p class="star-note p-3 text-sm">★ 黃宗羲的史傳多記抗清義士的事蹟，亦寫才藝人物。〈柳敬亭傳〉筆法頗具《史記》與八大家的風格。</p>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 王夫之 -->
+    <div id="panel-wang" class="scholar-panel hidden grid lg:grid-cols-2 gap-8">
+      <div class="bg-white/80 rounded-xl p-6 shadow border-t-8 border-[#2f6b4f]">
+        <div class="flex items-baseline justify-between flex-wrap gap-2">
+          <h3 class="text-2xl font-black text-[#2f6b4f]">王夫之（1619–1692）</h3>
+          <span class="text-sm text-stone-500">字而農，號薑齋，晚居石船山，世稱船山先生。衡州（湖南衡陽）人。</span>
+        </div>
+        <h4 class="mt-5 mb-3 font-bold tracking-widest text-stone-600">（一）生平</h4>
+        <ol class="space-y-4 border-l-2 border-[#2f6b4f]/40 pl-6 text-justify leading-7">
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#2f6b4f] text-[#2f6b4f]"></span>張獻忠入衡州強迫徵用，得計而脫。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#2f6b4f] text-[#2f6b4f]"></span>清兵南下，積極參與抗清運動。投奔桂王永曆政權，陷入內鬥，險被害死。</li>
+          <li class="relative"><span class="tl-dot absolute -left-[31px] top-2 w-2.5 h-2.5 rounded-full bg-[#2f6b4f] text-[#2f6b4f]"></span>返鄉歸隱，於石船山讀書著述十七年。</li>
+        </ol>
+        <div class="mt-6 p-4 rounded-lg bg-[#2f6b4f]/10 border border-[#2f6b4f]/30 text-sm leading-7">
+          <p class="font-bold text-[#2f6b4f] mb-1">思想體系</p>
+          王夫之在張載「理氣合一」的基礎上，融合濂、洛、閩（濂溪周敦頤、洛陽程頤程顥、關中張載、閩中朱熹——宋代理學四大流派），發展出「道器合一」、「名實合一」、「體用合一」，側重實踐的體系。
+        </div>
+      </div>
+      <div class="space-y-4">
+        <h4 class="font-bold tracking-widest text-stone-600">（二）文學觀（點按展開原文）</h4>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f6b4f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">1. 維護正統儒學為宗旨<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「建之為道術，推之為治法，內以求心，勿損其心，出以安天下，勿以賊天下，古之聖人，仁及萬世，儒者修明之而見諸行事，唯此而已。」（〈老莊申韓論〉）</p>
+            <p class="star-note p-3 text-sm">★ 以道學家的觀點為主調。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f6b4f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">2. 推崇張載<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「嗚呼！張子之學，上承孔、孟之志，下救來茲之失，如皎日麗天，無幽不燭，聖人復起，未有能易焉者也。」（《張子正蒙注‧序》）</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f6b4f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">3. 讚賞《離騷》，偏愛賦體<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「夫文賦亦非必為道之所賤也，其源始於楚騷，忠愛積而悱惻生，以搖蕩性情而伸其隱誌，君子所樂尚焉。流及於司馬相如、揚雄，而諷諫亦行乎其間。六代之衰，操觚者始取青妃白，移宮換羽，而為不實之華；然而雅鄭相雜，其不詭於貞者，亦不絕於世。」（《讀通鑑論》）</p>
+            <p class="star-note p-3 text-sm">★ 王夫之生長於楚、湘之地，且遭遇與屈原相似，故特別喜歡《離騷》，文集中也有非常多的賦。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f6b4f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">4.「文以言道」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「君子之有文，以言道也，以言志也。道者，天之道；志者，己之志也。上以奉天而不違，下以盡己而不失，則其視文也，莫有重焉。」（《讀通鑑論》）</p>
+            <p class="star-note p-3 text-sm">★《讀通鑑論》中，只要涉及為文者，王夫之都會以是否符合「聖道」、是否有助於時政為標準。</p>
+          </div></div>
+        </div>
+        <div class="acc bg-white/80 rounded-xl shadow border-l-4 border-[#2f6b4f]">
+          <button class="acc-head w-full text-left px-5 py-4 font-bold flex justify-between items-center">5.「以意為主」<span class="chev">▾</span></button>
+          <div class="acc-body"><div class="px-5 pb-5 space-y-3">
+            <p class="quote-box p-4 text-sm leading-7">「無論詩歌與長行文字，俱以意為主。意猶帥也，無帥之兵，謂之烏合。」</p>
+            <p class="star-note p-3 text-sm">★ 所謂的「意」，不單只有「思想內容」，還包括情志意趣；王夫之談「意」從來不離開「情」。</p>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 時間軸 -->
+<section id="timeline" class="py-14 bg-[#26221c] text-[#f6f1e6]">
+  <div class="max-w-5xl mx-auto px-4">
+    <h2 class="text-3xl font-black mb-10 reveal"><span class="brush-title">參・生平時間軸</span></h2>
+    <div class="relative border-l-2 border-[#a9761c]/60 ml-3 sm:ml-6 space-y-8">
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#a9761c]"></span>
+        <p class="font-black text-[#a9761c] text-lg">1610</p><p class="leading-7">黃宗羲生於浙江餘姚。其父黃尊素為東林黨骨幹，後被閹黨殘害而死。</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#b3341f]"></span>
+        <p class="font-black text-[#e08a7a] text-lg">1613</p><p class="leading-7">顧炎武生於江蘇崑山。原名絳，字忠清。</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#2f6b4f]"></span>
+        <p class="font-black text-[#8fc7a8] text-lg">1619</p><p class="leading-7">王夫之生於湖南衡州。</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#b3341f]"></span>
+        <p class="font-black text-[#e08a7a] text-lg">1639（崇禎十二年）</p><p class="leading-7">顧炎武絕意仕途，開始纂述《日知錄》。書名取自《論語・子張》：「日知其所亡，月無忘其所能，可謂好學也已矣。」</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#a9761c]"></span>
+        <p class="font-black text-[#a9761c] text-lg">1644–1645・明清鼎革</p><p class="leading-7">清兵入關、攻陷南京，明亡。顧炎武改名「炎武」，投入南明與義軍抗清；黃宗羲加入魯王監國政權；王夫之投奔桂王永曆政權。三人皆積極參與抗清運動。</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#a9761c]"></span>
+        <p class="font-black text-[#a9761c] text-lg">其後・歸隱著述</p><p class="leading-7">抗清事敗後，三人先後返鄉歸隱：黃宗羲講學著述、堅辭「博學鴻詞」與史局之招；王夫之於石船山讀書著述十七年；顧炎武則變賣家產北上，考察山川、聯結反清人士，並拒絕修《明史》之邀。</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#b3341f]"></span>
+        <p class="font-black text-[#e08a7a] text-lg">1682</p><p class="leading-7">顧炎武卒。</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#2f6b4f]"></span>
+        <p class="font-black text-[#8fc7a8] text-lg">1692</p><p class="leading-7">王夫之卒。</p></div>
+      <div class="reveal pl-8 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#2f4b8f]"></span>
+        <p class="font-black text-[#9db4e6] text-lg">1695</p><p class="leading-7">黃宗羲卒。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 對照表 -->
+<section id="compare" class="py-14">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-black mb-8 reveal"><span class="brush-title">肆・三人對照表</span></h2>
+    <div class="overflow-x-auto reveal rounded-xl shadow border border-[#d8c9a5]">
+      <table class="w-full min-w-[720px] bg-white/90 text-sm sm:text-base">
+        <thead>
+          <tr class="text-[#f6f1e6]">
+            <th class="p-4 bg-[#26221c] text-left w-36">項目</th>
+            <th class="p-4 bg-[#b3341f] text-left">顧炎武</th>
+            <th class="p-4 bg-[#2f4b8f] text-left">黃宗羲</th>
+            <th class="p-4 bg-[#2f6b4f] text-left">王夫之</th>
+          </tr>
+        </thead>
+        <tbody class="align-top">
+          <tr class="border-t border-[#e5dcc6]"><td class="p-4 font-bold">生卒年</td><td class="p-4">1613–1682</td><td class="p-4">1610–1695</td><td class="p-4">1619–1692</td></tr>
+          <tr class="border-t border-[#e5dcc6] bg-[#faf7ef]"><td class="p-4 font-bold">字號／籍貫</td><td class="p-4">字寧人，號亭林；崑山（江蘇）</td><td class="p-4">字太沖，號南雷、梨洲；餘姚（浙江）</td><td class="p-4">字而農，號薑齋、船山；衡州（湖南）</td></tr>
+          <tr class="border-t border-[#e5dcc6]"><td class="p-4 font-bold">代表著作</td><td class="p-4">《日知錄》《天下郡國利病書》</td><td class="p-4">《明夷待訪錄》〈柳敬亭傳〉</td><td class="p-4">《讀通鑑論》《張子正蒙注》</td></tr>
+          <tr class="border-t border-[#e5dcc6] bg-[#faf7ef]"><td class="p-4 font-bold">文學觀核心</td><td class="p-4">明道救世、經世致用、反對摹仿</td><td class="p-4">文以載道、情感決定、事功節義</td><td class="p-4">文以言道、以意為主、偏愛楚騷賦體</td></tr>
+          <tr class="border-t border-[#e5dcc6]"><td class="p-4 font-bold">學術傾向</td><td class="p-4">批判理學空談，開清代樸學、漢學先聲</td><td class="p-4">極力推揚王陽明心學</td><td class="p-4">推崇張載，融合濂洛閩，道器合一</td></tr>
+          <tr class="border-t border-[#e5dcc6] bg-[#faf7ef]"><td class="p-4 font-bold">遺民事蹟</td><td class="p-4">拒修《明史》：「不為介之推逃，則為屈原之死」</td><td class="p-4">堅辭博學鴻詞與史局之招</td><td class="p-4">石船山著述十七年</td></tr>
+          <tr class="border-t border-[#e5dcc6]"><td class="p-4 font-bold">共同主張</td><td class="p-4" colspan="3">遺民立場、民族意識強烈；「經世致用」；題材切近現實，語言質樸，風格剛健渾厚。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 選讀文本（含白話翻譯） -->
+<section id="texts" class="py-14 bg-[#efe7d6] border-y border-[#d8c9a5]">
+  <div class="max-w-5xl mx-auto px-4">
+    <h2 class="text-3xl font-black mb-3 reveal"><span class="brush-title">伍・選讀文本（原文／白話翻譯）</span></h2>
+    <p class="text-stone-600 mb-8 reveal">展開篇目後，可用「原文／白話翻譯」按鈕切換對讀，先讀原文、再核對譯文，效果更佳。</p>
+
+    <!-- 顧炎武 奴僕 -->
+    <div class="acc open reveal bg-white/85 rounded-xl shadow mb-6 border-t-8 border-[#b3341f]">
+      <button class="acc-head w-full text-left px-6 py-5 flex justify-between items-center">
+        <span><span class="font-black text-lg text-[#b3341f]">顧炎武《日知錄卷十七‧奴僕》</span><span class="ml-3 text-sm text-stone-500 hidden sm:inline">論明末社會畜養奴僕的流弊</span></span>
+        <span class="chev text-xl">▾</span>
+      </button>
+      <div class="acc-body"><div class="reading-body px-6 pb-6 space-y-5">
+        <div class="flex gap-2 flex-wrap items-center">
+          <button class="mode-btn active" data-view="orig-gu">原文</button>
+          <button class="mode-btn" data-view="trans-gu">白話翻譯</button>
+        </div>
+
+        <div id="orig-gu" class="text-view classical orig-view max-h-96 overflow-y-auto pr-3 rounded-lg p-5 text-[15px] space-y-4">
+          <p>顏氏家訓，鄴下有一領軍，貪積已甚，家童八百，誓滿一千。唐李義府多取人奴婢，乃敗，各散歸其家。時人為露布雲，混奴婢而亂放，各識家而競入。【原註】潘岳西征賦曰，混雞犬而亂放，各識家而競入。太祖數涼國公藍玉之罪亦曰，家奴至於數百。今日江南士大夫多有此風，一登仕籍，此輩競來門下，謂之投靠，多者亦至千人。而其用事之人，則主人之起居食息，以至於出處語默，無一不受其節制。有甘於毀名喪節而不顧者，奴者主之，主者奴之。嗟乎，此六逆之所由來矣。</p>
+          <p>漢書霍光傳，任宣言，大將軍時，百官已下，但事馮子都、王子方等。【原註】皆老奴。又曰，初，光愛幸監奴馮子都，常與計事。【原註】師古曰，監奴，奴之監知家務者也。及顯【原註】光妻。寡居，與子都亂。夫以出入殿門，進止不失尺寸之人，而溺情女子、小人，遂至於此。今時士大夫之僕，多有以色而昇，以妻而寵。夫上有漁色之主，則下必有烝弒之臣。清斯濯纓，濁斯濯足，自取之也。是以欲清閨門，必自簡童僕始。【楊氏曰】顯，故婢也。光夫人東閭氏歿，立為妻。</p>
+          <p>嚴分宜之僕永年，號曰鶴坡。張江陵之僕游守禮，號曰楚濱。【原註】古詩，昔有霍家奴，姓馮名子都。而晉灼引漢語以為馮殷，則子都亦字也。不但招權納賄，而朝中多贈之詩文，儼然與措紳為賓主。名號之輕，文章之唇，至斯而甚。異日媚閹建祠，非此為主嚆矢乎？</p>
+          <p>人奴之多，吳中為甚。【原註】史言呂不韋家童萬人，嫪毐家童數千人。今吳中仕宦之家，有至一二千人者。其專恣暴橫，亦惟吳中為甚。有王者起，當悉免為良而徙之，以實遠方空虛之地。士大夫之家所用僕役，並令出貲雇募，如江北之例。【原註】鄭司農周禮司厲注曰，今之奴婢，古之罪人也。風俗通言，古制本無奴婢，奴婢皆是犯事者。今吳中亦諱其名，謂之家人。則豪橫一清，而四鄉之民得以安枕。其為士大夫者，亦不受制於人，可以勉而為善。訟簡風淳，其必自此始矣。【方侍郎曰】古無奴婢。事父兄者，子弟也。事舅姑者，子婦也。事長官者，屬吏也。惟盜賊之子女，乃為罪隸而役於官。九職臣妾聚斂疏財，質人掌民人之質劑。蓋士大夫之家始有之，如後世宮賜奴婢，亦以罪役耳。戰國秦漢以接，平民始得相買為奴。然寒素儒生，必父母篤老，子婦多事，然後傭僕賃嫗，以助奉養。金陵之俗，中家以上，婦不主中饋、事舅姑，而飲食必鑿，燕遊惟便，縫紝補綴皆取辦於工，仍坐役僕婦及婢女數人，少者亦一二人，婦安焉，子順焉，蓋以母之道奉其妻，而有過矣。余每見農家婦耕耘樵蘇，佐男子力作，時雨降，脫履就功，形骸若鳥獸。然遭亂離焚剽，則常泰然無虞，蓋其色不足貪也，家無積貨可羨也。雖盜賊奸凶，不能不留農夫野婦耕織，以供戰士。而劫辱系虜斬刈無遺者，則皆通都大邑搢紳家室主子女也。人事之感召，天道之乘除，蓋有確然而不可易者矣。【汝成案】今日此風，不特金陵為然，蓋力作之教微，憜游之風熾，其積習相沿，已幾於不可改也。（《日知錄集釋》）</p>
+        </div>
+
+        <div id="trans-gu" class="text-view hidden classical trans-view max-h-96 overflow-y-auto pr-3 rounded-lg p-5 text-[15px] space-y-4">
+          <p class="mb-1"><span class="trans-badge bg-[#2f6b4f] text-white">白話翻譯</span></p>
+          <p>《顏氏家訓》記載：鄴下有一位領軍將軍，貪婪斂財非常嚴重，家中有八百個家童，還發誓要湊滿一千個。唐朝的李義府大量收買別人的奴婢，等到他敗落之後，這些奴婢便各自散去、回到原來的家。當時的人寫了篇露布（公開文告）說：「混雜著奴婢一起亂放，各自認得自己的家而爭相跑入。」【原註】潘岳《西征賦》說：「混雞犬而亂放，各識家而競入。」明太祖數落涼國公藍玉的罪狀時也說：「家中奴僕多到數百人。」如今江南的士大夫大多有這種風氣，一旦登上仕籍、有了功名，這些人便爭相來到門下，稱作「投靠」，多的也能達到上千人。而那些掌權管事的人，主人的起居作息，以至於出處語默，沒有一項不受他們節制。甚至有甘心毀名喪節也毫不顧惜的人——奴僕反倒成了主人，主人反倒被奴僕所役使。唉！這就是「六逆」（六種悖逆亂象）的由來啊。</p>
+          <p>《漢書‧霍光傳》記載，任宣說：大將軍霍光當權的時候，百官以下，只知道侍奉馮子都、王子方等人。【原註】這些都是老奴。傳中又說：起初，霍光寵幸監奴馮子都，常常與他商議事情。【原註】師古說：「監奴，是奴僕中監督掌管家務的人。」等到霍顯（霍光的妻子）守寡，竟與馮子都私通。像霍光這樣出入宮殿門、進退不失分寸的人，卻沉溺於女子、小人，竟然到了這個地步。如今士大夫的僕人，很多是靠美色而升遷、靠妻子而得寵的。在上既有貪圖美色的主人，在下就必有淫亂弒上的臣子。「滄浪之水清，可以洗我的帽纓；滄浪之水濁，可以洗我的腳」——清或濁，都是自己招致的。因此想要肅清閨門，必須從精簡童僕開始。【楊氏曰】霍顯原本是婢女。霍光的夫人東閭氏死後，她被立為妻。</p>
+          <p>嚴分宜（嚴嵩）的僕人永年，號稱「鶴坡」；張江陵（張居正）的僕人游守禮，號稱「楚濱」。【原註】古詩說：「從前有個霍家的奴僕，姓馮名子都。」而晉灼引用《漢語》認為（他名）馮殷，那麼「子都」也就是他的字了。這些僕人不只招攬權勢、收納賄賂，朝廷中還有很多人贈送他們詩文，儼然與士大夫們以賓主相稱。名號的輕濫、文章的濫用，到了這個地步實在太嚴重了。日後諂媚太監、為其建立生祠的風氣，不正是以此為開端（嚆矢）嗎？</p>
+          <p>人家蓄奴之多，以吳中最為嚴重。【原註】史書說呂不韋家童一萬人，嫪毐家童數千人。如今吳中做官的人家，有的多到一二千人。他們的專橫暴虐，也唯有吳中最厲害。若有聖王興起，應當把這些奴僕全部放免為良民，並遷徙他們去充實遠方空虛的土地。士大夫家中所用的僕役，一律命令出錢雇募，如同江北的慣例。【原註】鄭司農注《周禮‧司厲》說：「如今的奴婢，就是古代的罪人。」《風俗通》說：「古制本來沒有奴婢，奴婢都是犯罪的人。」如今吳中人也避諱「奴婢」這個名稱，稱之為「家人」。那麼豪強橫暴之氣一旦肅清，四鄉的百姓就能安然高枕了。那些做士大夫的，也不再受他人挾制，可以勉力向善。訴訟簡省、風氣淳樸，必定從此開始了。【方侍郎曰】古代沒有奴婢。侍奉父兄的，是子弟；侍奉公婆（舅姑）的，是兒媳；侍奉長官的，是屬吏。只有盜賊的子女，才成為罪隸而在官府服役。《周禮》九職中的「臣妾」負責聚斂零散的財物，「質人」掌管民間買賣的契約。大概士大夫家中才開始有奴婢，就像後世宮中所賜的奴婢，也是因犯罪而服役罷了。戰國、秦、漢以來，平民才開始能夠互相買賣為奴。但是清寒的讀書人，必須是父母年邁、兒媳事務繁多，然後才僱用僕人、租用老婦，以幫助奉養。金陵的風俗，中等以上的人家，婦人不主持飲食、不侍奉公婆，而飲食必定講究，宴飲遊玩只求方便，縫紉補綴全都交給工匠，還坐著役使僕婦和婢女好幾個人，少的也有一兩個人。婦人安享，兒子和順——這大概是用奉事母親的禮數來奉承妻子，而且有過之了。我常常見到農家婦女耕耘打柴，幫助男子出力幹活；時雨降下，就脫鞋下田勞作，形骸辛苦得像鳥獸一樣。然而遭遇亂離焚掠，卻常常泰然無憂——大概是她們的容貌不值得貪圖，家中沒有積蓄的財物令人羨慕。即使是盜賊奸凶，也不能不留下農夫農婦耕織，以供養戰士。而遭到劫辱、繫虜、斬殺無一倖免的，都是通都大邑中士大夫家的妻室子女。人事的感召、天道的乘除消長，確實有確然而不可改變的道理啊。【汝成案】如今這種風氣，不只在金陵如此——大概是由於勞作的教化衰微、懶惰遊蕩的風氣熾盛，這種積習相沿，已經幾乎到了不可改變的地步了。（《日知錄集釋》）</p>
+        </div>
+
+        <div class="space-y-2 text-sm leading-7">
+          <p class="font-bold text-[#b3341f]">★《日知錄》重點</p>
+          <p>1.《日知錄》始撰於崇禎十二年（1639）顧炎武絕意仕途，書名取之於《論語・子張》。子夏曰：「日知其所亡，月無忘其所能，可謂好學也已矣。」（每天都學到新東西，每月不忘學會的東西，就算好學了。）</p>
+          <p>2.〈目錄題辭〉說：「愚自少讀書，有所得輒記之，其有不合，時有改定」。</p>
+          <p>3. 全書包括「經義」（新義詮釋古經）、「治道」（分析社會經濟情況）、「博聞」（一般知識）三大類。（「別著《日知錄》，上篇經術，中篇治道，下篇博聞，共三十餘卷。有王者起，將以見諸行事，以躋斯世於治古之隆。」）</p>
+          <p>4.〈奴僕〉一文乃論明末社會畜養奴僕的流弊。</p>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 黃宗羲 田制三 -->
+    <div class="acc reveal bg-white/85 rounded-xl shadow mb-6 border-t-8 border-[#2f4b8f]">
+      <button class="acc-head w-full text-left px-6 py-5 flex justify-between items-center">
+        <span><span class="font-black text-lg text-[#2f4b8f]">黃宗羲《明夷待訪錄‧田制三》（節錄）</span><span class="ml-3 text-sm text-stone-500 hidden sm:inline">積累莫返之害</span></span>
+        <span class="chev text-xl">▾</span>
+      </button>
+      <div class="acc-body"><div class="reading-body px-6 pb-6 space-y-5">
+        <div class="flex gap-2 flex-wrap items-center">
+          <button class="mode-btn active" data-view="orig-huang">原文</button>
+          <button class="mode-btn" data-view="trans-huang">白話翻譯</button>
+        </div>
+
+        <div id="orig-huang" class="text-view classical orig-view max-h-96 overflow-y-auto pr-3 rounded-lg p-5 text-[15px] space-y-4">
+          <p>何謂積累莫返之害？三代之貢、助、徹，止稅田土而已。魏晉有戶、調之名，有田者出租賦，有戶者出布帛，田之外復有戶矣。</p>
+          <p>唐初立租、庸、調之法，有田則有租，有戶則有調，有身則有庸，租出穀，庸出絹，調出繒纊布麻，戶之外復有丁矣。</p>
+          <p>楊炎變為兩稅，人無丁中，以貧富為差，雖租、庸、調之名渾然不見，其實並庸、調而入於租也。相沿至宋，未嘗減庸、調於租內，而復斂丁身錢米。</p>
+          <p>後世安之，謂兩稅，租也，丁身，庸、調也，豈知其為重出之賦乎？使庸、調之名不去，何至是耶！故楊炎之利於一時者少，而害於後世者大矣。有明兩稅，丁口而外，有力差，有銀差，蓋十年而一值。</p>
+          <p>嘉靖末行一條鞭法，通府州縣十歲中夏稅、秋糧、存留、起運之額，均徭、里甲、土貢、顧募、加銀之例，一條總征之，使一年而出者分為十年，及至所值之年一如餘年，是銀、力二差又併入於兩稅也；未幾而里甲之值年者，雜役仍復紛然。</p>
+          <p>其後又安之，謂條鞭，兩稅也；雜役，值年之差也，豈知其為重出之差乎？使銀差、力差之名不去，何至是耶！故條鞭之利於一時者少，而害於後世者大矣。</p>
+          <p>萬曆間，舊餉五百萬，其末年加新餉九百萬，崇禎間又增練餉七百三十萬，倪元璐為戶部，合三餉為一，是新餉、練餉又併入於兩稅也。至今日以為兩稅固然，豈知其所以亡天下者之在斯乎？使練餉、新餉之名不改，或者顧名而思義，未可知也。此又元璐不學無術之過也。嗟乎！稅額之積累至此，民之得有其生也亦無幾矣。</p>
+          <p>今欲定稅，須反積累以前而為之制。援田於民，以什一為則；未授之田，以二十一為則。其戶口則以為出兵養兵之賦，國用自無不足，又何事於暴稅乎！</p>
+        </div>
+
+        <div id="trans-huang" class="text-view hidden classical trans-view max-h-96 overflow-y-auto pr-3 rounded-lg p-5 text-[15px] space-y-4">
+          <p class="mb-1"><span class="trans-badge bg-[#2f6b4f] text-white">白話翻譯</span></p>
+          <p>什麼叫做「積累莫返之害」？夏、商、周三代的貢、助、徹（三種稅法），只對田地徵稅罷了。魏晉時期有了「戶」「調」的名目：有田地的繳納租賦，有戶口的繳納布帛——在田賦之外，又多出了戶調。</p>
+          <p>唐初確立了租、庸、調的賦稅法：有田地就繳納租（穀物），有戶口就繳納調（繒、纊、布、麻），有丁身就繳納庸（絹）——在戶調之外，又多出了丁庸。</p>
+          <p>楊炎改制為兩稅法，不再區分丁、中，而以貧富為等差。雖然租、庸、調的名目完全看不到了，實際上是把庸、調合併進了租裡面。沿襲到宋代，不曾從租裡減去庸、調，卻又另外徵收丁身的錢米。</p>
+          <p>後世的人安於現狀，認為兩稅就是租，丁身就是庸、調——哪裡知道這是重複徵收的賦稅呢？假使庸、調的名目不廢除，怎會到這個地步呢！所以楊炎的兩稅法，對一時有利者少，而對後世為害者大。明代的兩稅，在丁口之外，又有「力差」「銀差」，大約十年輪值一次。</p>
+          <p>嘉靖末年施行「一條鞭法」：把府州縣十年中的夏稅、秋糧、存留、起運的數額，以及均徭、里甲、土貢、顧募、加銀等項目，合併為一條統一徵收；使本來一年繳納的，分為十年繳納；可是等到輪值那一年，仍舊像其他年份一樣照常繳納——這樣銀差、力差就又合併進兩稅了。沒過多久，里甲輪值的人，各種雜役又紛然出現。</p>
+          <p>其後人們又安於現狀，認為「條鞭」就是兩稅，雜役是輪值之年的差役——哪裡知道這是重複徵收的差役呢？假使銀差、力差的名目不廢除，怎會到這個地步呢！所以一條鞭法，對一時有利者少，而對後世為害者大。</p>
+          <p>萬曆年間，舊餉五百萬；到了末年又加征新餉九百萬；崇禎年間又增加練餉七百三十萬。倪元璐擔任戶部時，把三餉合併為一——這樣新餉、練餉又合併進兩稅了。到如今以為兩稅本來就是如此，哪裡知道亡天下的原因就在這裡呢？假使練餉、新的名目不更改，人們或許看到名稱而想到其背後的含義，也未可知。這又是倪元璐不學無術的過錯了。唉！稅額積累到這個地步，百姓能夠保有生機的，也所剩無幾了。</p>
+          <p>如今要制定賦稅，必須回到「積累」之前而制定制度：把田地授予百姓，以十取一（什一）為準則；沒有授出的田地，以二十取一為準則。至於戶口，則用以作為出兵、養兵的賦稅——如此，國家的用度自然不會不足，又何必徵收苛暴的賦稅呢！</p>
+        </div>
+
+        <div class="space-y-2 text-sm leading-7">
+          <p class="font-bold text-[#2f4b8f]">★《明夷待訪錄》重點</p>
+          <p>1. 體現黃宗羲民主、民本的思想。「明夷」出自《周易》卦名：「箕子之明夷」，據《周易正義》云：「日入地中，明夷之象；施之於人事，闇主在上，明臣在下，不敢顯其明志，亦明夷之義也」。「明夷」指黎明前的昏暗，「待訪」指等待明君來訪；全名意為黎明前等待明君來訪的備忘錄。</p>
+          <p>2. 顧炎武：「讀《待訪錄》，知百王之弊可以復振。」</p>
+          <p>3. 本文分析如何去除賦稅制度中的「積累莫返之害」：歷朝為減輕、規範農民賦稅而推出合併賦稅的新政策，僅在初期起一定作用；市場平衡機制被擾動後，便無法抑止層出不窮的新稅。後代王朝往往因缺錢，在前代基礎上再度合併賦稅，導致不同名目的賦稅被反覆疊加徵收，最終反而變本加厲加重農民負擔。</p>
+          <p>4. 典型例子是張居正施行的一條鞭法：將田賦、徭役及其他雜徵總為一條，折成銀兩，並明令不得增加其他名目賦稅。</p>
+          <p>5. 但到明朝中後期，朝廷仍徵收其他賦稅，如為應付滿族入侵而開徵的遼餉等，加重農民負擔，客觀上激化了農民起義。</p>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 王夫之 靈帝五 -->
+    <div class="acc reveal bg-white/85 rounded-xl shadow border-t-8 border-[#2f6b4f]">
+      <button class="acc-head w-full text-left px-6 py-5 flex justify-between items-center">
+        <span><span class="font-black text-lg text-[#2f6b4f]">王夫之《讀通鑑論‧靈帝五》</span><span class="ml-3 text-sm text-stone-500 hidden sm:inline">漢靈帝好文學與辭賦</span></span>
+        <span class="chev text-xl">▾</span>
+      </button>
+      <div class="acc-body"><div class="reading-body px-6 pb-6 space-y-5">
+        <div class="flex gap-2 flex-wrap items-center">
+          <button class="mode-btn active" data-view="orig-wang">原文</button>
+          <button class="mode-btn" data-view="trans-wang">白話翻譯</button>
+        </div>
+
+        <div id="orig-wang" class="text-view classical orig-view max-h-96 overflow-y-auto pr-3 rounded-lg p-5 text-[15px] space-y-4">
+          <p>嗚呼！世愈移而士趨日異，亦惡知其所歸哉！靈帝好文學之士，能為文賦者，待制鴻都門下，樂松等以顯，而蔡邕露章謂其「遊意篇章，聊代博弈」。甚賤之也。自隋煬帝以迄於宋，千年而以此取士，貴重崇高，若天下之賢者，無踰於文賦之一途。漢所賤而隋、唐、宋所貴，士不得不貴焉；世之趨而日下，亦至此乎！</p>
+          <p>夫文賦亦非必為道之所賤也，其源始於楚騷，忠愛積而悱惻生，以搖蕩性情而伸其隱誌，君子所樂尚焉。流及於司馬相如、揚雄，而諷諫亦行乎其間。六代之衰，操觚者始取青妃白，移宮換羽，而為不實之華；然而雅鄭相雜，其不詭於貞者，亦不絕於世。夫蔡邕者，亦嘗從事矣，而斥之為優俳，將無過乎！</p>
+          <p>要而論之，樂而不淫，誹而不傷，麗而不蕩；則涵泳性情而蕩滌誌氣者，成德成材以後，滿於中而鬯於外者之所為。而以之取士於始進，導幼學以浮華，內遺德行，外略經術，則以導天下之淫而有余。故邕可自為也，而不樂松等之輒為之，且以戒靈帝之以拔人才於不次也。</p>
+          <p>繇是言之，士趨亦何嘗有異哉？上之用之也別耳。於是而王安石之經義，雖亦末耳，而不傷其本，庶幾乎華實兼茂之道也。元祐革新法，而並此革之，過矣。若王鏊、錢福之淺陿，陶望齡、湯賓尹之卑陋，則末流波靡，而非作者之涼也。經義者，非徒干祿之器也，士之所研精以極道者也。文賦者，非幼學之習也，誌正學充，傷今思古，以待人之微喻者也。而誌士崇業以單心，亦可於此而審所從矣。</p>
+        </div>
+
+        <div id="trans-wang" class="text-view hidden classical trans-view max-h-96 overflow-y-auto pr-3 rounded-lg p-5 text-[15px] space-y-4">
+          <p class="mb-1"><span class="trans-badge bg-[#2f6b4f] text-white">白話翻譯</span></p>
+          <p>唉！世道越是變遷，士人的趨向越是不同，又怎能知道它最終的歸向呢！漢靈帝喜好文學之士，能寫文賦的人，在鴻都門下待詔供職，樂松等人因此顯達；而蔡邕上疏說他們「把心思用在篇章上，只是用來代替博弈（下棋）罷了」，非常輕視他們。從隋煬帝直到宋代，一千年都用文賦來選拔士人，視之為貴重崇高，好像天下的賢能，沒有超過文賦這一條路的。漢代所輕賤的，隋、唐、宋卻重視它，士人便不得不重視它；世風趨向下流到這個地步，也真是到了極點啊！</p>
+          <p>其實文賦也未必一定被「道」所輕賤：它的源頭始於楚國的《離騷》，忠愛之情積聚而生悱（內心有所感觸而想表達），用以搖蕩性情、抒發內心隱微的志意，這是君子所樂於崇尚的。流傳到司馬相如、揚雄，諷諫之義也施行在其中。到了六朝的衰敗，執筆為文的人開始「取青妃白」（講究辭藻色彩的对偶配搭）、「移宮換羽」（變換聲律音調），而寫出不切實際的浮華之作；然而雅正與鄭衛（淫靡）之音相雜，其中不違背正道的，也並未在世上絕跡。蔡邕本人，也曾從事文賦創作，卻斥責別人為「優俳」（倡優戲子），恐怕也太过分了吧！</p>
+          <p>總括來說：「快樂而不過度，怨刺而不哀傷，華美而不放蕩」——涵養性情、蕩滌志氣，這是成德成材之後，內心充實而自然流露於外的表現。但如果用文賦來選拔初進的士人，用浮華來引導初學者，內心遺棄德行，外在忽略經術，那麼就會引導天下走向淫靡而有餘。所以蔡邕可以自己從事文賦，卻不樂意樂松等人動不動就靠文賦進身；並且以此警戒靈帝不按常規（不次）地提拔人才。</p>
+          <p>由此說來，士人的趨向又何嘗有不同呢？不過是上位者如何運用罷了。因此王安石的經義（以經義取士），雖然也屬末流，卻不傷害根本，差不多接近「華實兼茂」之道了。元祐年間革新法，連經義取士也一併革除，這就錯了。像王鏊、錢福的淺薄狹隘，陶望齡、湯賓尹的卑下鄙陋——那是末流波靡的表現，而不是創始者的過失。經義，不只是求取俸祿的工具，而是士人精深鑽研以窮盡大道的憑藉。文賦，不是初學者該學習的，而是志趣端正、學問充實，感傷今世、追思古人，等待後人微妙領悟的東西。而立志崇業、專心致志的人，也可以在此審慎地選擇所要追從的了。</p>
+        </div>
+
+        <div class="space-y-2 text-sm leading-7">
+          <p class="font-bold text-[#2f6b4f]">★《讀通鑑論》重點</p>
+          <p>1.《讀通鑑論》是王夫之閱讀《資治通鑑》及歷史的議論。書成於晚年，讀史有感、隨事觸發，初無意於為文，故每篇皆不立題目；而於上下古今興亡得失之故、製作輕重之原，均有論列。</p>
+          <p>2. 全書三十卷：秦一卷，西漢四卷，東漢四卷，三國一卷，晉四卷，宋、齊、梁、陳、隋各一卷，唐八卷，五代三卷，另附《敘論》四篇為「卷末」，約六十餘萬字。每卷以朝代為別，每代以帝王之號為別。</p>
+          <p>3. 本文主要講述漢靈帝愛好文學，特別是辭賦的內容。</p>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 記憶翻卡 -->
+<section id="cards" class="py-14">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-black mb-3 reveal"><span class="brush-title">陸・重點記憶翻卡</span></h2>
+    <p class="text-stone-600 mb-8 reveal">點選卡片翻面，檢視重點說明。</p>
+    <div id="flipGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+  </div>
+</section>
+
+<!-- 測驗 -->
+<section id="quiz" class="py-14 bg-[#26221c] text-[#f6f1e6]">
+  <div class="max-w-3xl mx-auto px-4">
+    <h2 class="text-3xl font-black mb-3 reveal"><span class="brush-title">柒・學習成效測驗</span></h2>
+    <p class="text-stone-400 mb-8 reveal">共 10 題，作答後立即顯示解析。</p>
+    <div id="quizBox" class="reveal bg-[#f6f1e6] text-[#26221c] rounded-2xl p-6 sm:p-8 shadow-[8px_8px_0_rgba(169,118,28,.6)]"></div>
+  </div>
+</section>
+
+<footer class="py-8 text-center text-sm text-stone-500">
+  <p>清初三大儒・互動學習網頁｜內容依據上課講義《0321 清初三大儒》編製</p>
+  <p class="mt-1 tracking-widest">顧炎武 ・ 黃宗羲 ・ 王夫之</p>
+</footer>
+
+<script>
+/* ---------- 學者分頁 ---------- */
+var scholarTabs = document.querySelectorAll('.scholar-tab');
+var scholarPanels = document.querySelectorAll('.scholar-panel');
+function openScholar(key){
+  scholarTabs.forEach(function(t){ t.classList.toggle('active', t.dataset.s === key); });
+  scholarPanels.forEach(function(p){
+    var show = p.id === 'panel-' + key;
+    p.classList.toggle('hidden', !show);
+    if(show){ p.classList.remove('panel-anim'); void p.offsetWidth; p.classList.add('panel-anim'); }
+  });
+  var target = document.getElementById('scholars');
+  if(target) target.scrollIntoView({behavior:'smooth'});
+}
+scholarTabs.forEach(function(t){ t.addEventListener('click', function(){ openScholar(t.dataset.s); }); });
+
+/* ---------- 手風琴 ---------- */
+document.querySelectorAll('.acc-head').forEach(function(head){
+  head.addEventListener('click', function(){ head.closest('.acc').classList.toggle('open'); });
+});
+
+/* ---------- 原文／白話翻譯 切換 ---------- */
+document.querySelectorAll('.mode-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var body = btn.closest('.reading-body');
+    body.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    body.querySelectorAll('.text-view').forEach(function(v){ v.classList.add('hidden'); });
+    var target = document.getElementById(btn.dataset.view);
+    if(target){ target.classList.remove('hidden'); target.scrollTop = 0; }
+  });
+});
+
+/* ---------- 進度條 ---------- */
+var progressBar = document.getElementById('progressBar');
+window.addEventListener('scroll', function(){
+  var h = document.documentElement;
+  var pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  progressBar.style.width = pct + '%';
+}, {passive:true});
+
+/* ---------- 捲動顯示 ---------- */
+var revealObserver = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('on'); revealObserver.unobserve(en.target); } });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el){ revealObserver.observe(el); });
+
+/* ---------- 導覽列高亮 ---------- */
+var navLinks = document.querySelectorAll('.nav-link');
+var secObserver = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){
+      navLinks.forEach(function(l){ l.classList.toggle('act', l.getAttribute('href') === '#' + en.target.id); });
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px'});
+['overview','scholars','timeline','compare','texts','cards','quiz'].forEach(function(id){
+  var s = document.getElementById(id); if(s) secObserver.observe(s);
+});
+
+/* ---------- 記憶翻卡 ---------- */
+var flipData = [
+  {t:'經世致用', c:'#b3341f', d:'治理世事、切合實用。三大儒共同主張，作品以史論、雜說、傳記為主，題材切近現實，語言質樸，風格剛健渾厚。'},
+  {t:'日知錄', c:'#b3341f', d:'顧炎武代表作。書名出自《論語・子張》「日知其所亡，月無忘其所能」。分經義、治道、博聞三大類。'},
+  {t:'明夷待訪錄', c:'#2f4b8f', d:'黃宗羲代表作，民主民本思想著作。「明夷」喻黎明前的昏暗，「待訪」即等待明君來訪的備忘錄。'},
+  {t:'黃宗羲定律', c:'#2f4b8f', d:'稅賦改革後農民負擔短期下降，隨後又漲至更高水平，即「積累莫返之害」。由清華大學秦暉總結命名。'},
+  {t:'讀通鑑論', c:'#2f6b4f', d:'王夫之晚年讀《資治通鑑》的史論，三十卷、六十餘萬字，每篇不立題目，隨事觸發而論興亡得失。'},
+  {t:'以意為主', c:'#2f6b4f', d:'王夫之：「意猶帥也，無帥之兵，謂之烏合。」意含思想內容與情志意趣，談「意」不離「情」。'},
+  {t:'文以載道', c:'#2f4b8f', d:'黃宗羲引周元公「文所以載道也」，與顧炎武同要求回歸載道目標；王夫之則言「文以言道」。'},
+  {t:'遺民', c:'#a9761c', d:'橫跨明清兩代、堅持不在清廷任官的作家。民族意識強烈，關心現實社會。'},
+  {t:'意猶帥也', c:'#2f6b4f', d:'無論詩歌與長行文字俱以意為主；無帥之兵謂之烏合。——王夫之「以意為主」說。'}
+];
+var flipGrid = document.getElementById('flipGrid');
+flipData.forEach(function(item){
+  var wrap = document.createElement('div');
+  wrap.className = 'flip reveal h-44 cursor-pointer select-none';
+  wrap.innerHTML =
+    '<div class="flip-inner">' +
+      '<div class="flip-face rounded-xl border-2 p-5 flex flex-col items-center justify-center bg-white/90 shadow" style="border-color:' + item.c + '">' +
+        '<p class="text-2xl font-black" style="color:' + item.c + '">' + item.t + '</p>' +
+        '<p class="text-xs text-stone-400 mt-3">點按翻面 ▸</p>' +
+      '</div>' +
+      '<div class="flip-face flip-back rounded-xl p-4 flex items-center justify-center text-sm leading-6 text-justify text-white shadow" style="background:' + item.c + '">' +
+        '<p>' + item.d + '</p>' +
+      '</div>' +
+    '</div>';
+  wrap.addEventListener('click', function(){ wrap.classList.toggle('flipped'); });
+  flipGrid.appendChild(wrap);
+  revealObserver.observe(wrap);
+});
+
+/* ---------- 測驗 ---------- */
+var quizData = [
+  {q:'下列何者「不屬於」清初三大儒？', o:['顧炎武','黃宗羲','王夫之','李贄'], a:3, e:'三大儒為顧炎武、黃宗羲、王夫之；李贄為晚明思想家，且受顧炎武嚴厲批評。'},
+  {q:'清初三大儒共同的主張是？', o:['抒發性靈','經世致用','擬古摹古','空談心性'], a:1, e:'三人共同主張「經世致用」（治理世事，切合實用），反對理學空談與摹仿。'},
+  {q:'「君子為學，以明道也，以救世也」出自誰？', o:['王夫之','黃宗羲','顧炎武','熊賜履'], a:2, e:'出自顧炎武〈與人書二十五〉，批判純文學創作（雕蟲篆刻）。'},
+  {q:'《日知錄》書名取自哪部經典？', o:['周易','論語・子張','尚書','資治通鑑'], a:1, e:'取自《論語・子張》：「日知其所亡，月無忘其所能，可謂好學也已矣。」'},
+  {q:'「明夷待訪錄」中「明夷」的意涵是？', o:['光明普照','黎明前的昏暗','日落而息','明君降臨'], a:1, e:'「明夷」出自《周易》卦名，指日入地中、黎明前的昏暗；「待訪」即等待明君來訪。'},
+  {q:'清華大學秦暉所總結的「黃宗羲定律」，針對的是哪種現象？', o:['科舉八股','賦稅改革後負擔反增','奴僕蓄養','黨爭內鬥'], a:1, e:'即「積累莫返之害」：稅賦合併改革後，新稅層出，農民負擔反而更重。'},
+  {q:'「意猶帥也，無帥之兵，謂之烏合」是誰的文學觀？', o:['王夫之','顧炎武','黃宗羲','張載'], a:0, e:'王夫之「以意為主」：意包含思想內容與情志意趣，談意不離情。'},
+  {q:'王夫之推崇哪位學者「上承孔、孟之志」？', o:['朱熹','周敦頤','張載','王陽明'], a:2, e:'見《張子正蒙注‧序》。王夫之在張載「理氣合一」基礎上發展出道器、名實、體用合一。'},
+  {q:'顧炎武拒絕受邀修纂哪部史書？', o:['宋史','明史','清史稿','資治通鑑'], a:1, e:'熊賜履邀修《明史》，炎武答：「果有此舉，不為介之推逃，則為屈原之死矣！」'},
+  {q:'黃宗羲哪篇傳記被譽為具《史記》與八大家風格，寫才藝人物？', o:['張居正傳','柳敬亭傳','霍光傳','劉伯溫傳'], a:1, e:'〈柳敬亭傳〉寫說書藝人柳敬亭，筆法具《史記》與八大家風格，注重「事功節義」。'}
+];
+var quizBox = document.getElementById('quizBox');
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuestion(){
+  qAnswered = false;
+  var item = quizData[qIndex];
+  var html = '';
+  html += '<div class="flex justify-between items-center text-sm text-stone-500 mb-4"><span>第 ' + (qIndex+1) + ' / ' + quizData.length + ' 題</span><span>得分：' + qScore + '</span></div>';
+  html += '<div class="w-full h-2 bg-[#e5dcc6] rounded mb-6"><div class="h-2 rounded bg-[#a9761c] transition-all" style="width:' + (qIndex/quizData.length*100) + '%"></div></div>';
+  html += '<h3 class="text-lg sm:text-xl font-bold leading-8 mb-6">' + item.q + '</h3>';
+  html += '<div class="space-y-3">';
+  item.o.forEach(function(opt, i){
+    html += '<button class="opt-btn w-full text-left px-5 py-3 rounded-lg border-2 border-[#d8c9a5] bg-white font-semibold" data-i="' + i + '">' + ['甲','乙','丙','丁'][i] + '、' + opt + '</button>';
+  });
+  html += '</div>';
+  html += '<div id="quizFeedback" class="hidden mt-6 p-4 rounded-lg text-sm leading-7"></div>';
+  html += '<div class="mt-6 text-right"><button id="quizNext" class="hidden px-6 py-2.5 bg-[#26221c] text-[#f6f1e6] rounded shadow hover:bg-black transition">' + (qIndex === quizData.length-1 ? '查看成績' : '下一題 →') + '</button></div>';
+  quizBox.innerHTML = html;
+
+  quizBox.querySelectorAll('.opt-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(qAnswered) return;
+      qAnswered = true;
+      var pick = parseInt(btn.dataset.i, 10);
+      var fb = document.getElementById('quizFeedback');
+      quizBox.querySelectorAll('.opt-btn').forEach(function(b, bi){
+        b.disabled = true;
+        if(bi === item.a) b.classList.add('opt-correct');
+      });
+      if(pick === item.a){
+        qScore++;
+        fb.className = 'mt-6 p-4 rounded-lg text-sm leading-7 bg-[#e5f3ea] border border-[#2f6b4f] text-[#1d4a36]';
+        fb.innerHTML = '✔ 答對了！<br>' + item.e;
+      }else{
+        btn.classList.add('opt-wrong');
+        fb.className = 'mt-6 p-4 rounded-lg text-sm leading-7 bg-[#f9e7e2] border border-[#b3341f] text-[#7c2415]';
+        fb.innerHTML = '✘ 答錯了。正確答案為「' + ['甲','乙','丙','丁'][item.a] + '」。<br>' + item.e;
+      }
+      fb.classList.remove('hidden');
+      document.getElementById('quizNext').classList.remove('hidden');
+    });
+  });
+  document.getElementById('quizNext').addEventListener('click', function(){
+    if(qIndex < quizData.length - 1){ qIndex++; renderQuestion(); }
+    else{ renderResult(); }
+  });
+}
+
+function renderResult(){
+  var rating = '';
+  if(qScore >= 9) rating = '大儒等級！博學篤行，深得亭林、梨洲、船山之神髓。';
+  else if(qScore >= 7) rating = '進士及第！對三大儒的生平與文學觀掌握良好。';
+  else if(qScore >= 5) rating = '舉人出身！基礎不錯，再複習一次選讀文本更上層樓。';
+  else if(qScore >= 3) rating = '秀才可期！建議重讀「三大儒」分頁與對照表。';
+  else rating = '童生莫灰心，回到概覽重新出發，經世致用、日知其所亡！';
+  quizBox.innerHTML =
+    '<div class="text-center py-6">' +
+      '<p class="text-sm tracking-[.3em] text-stone-500 mb-4">測驗結果</p>' +
+      '<p class="text-6xl font-black text-[#a9761c]">' + qScore + '<span class="text-2xl text-stone-500"> / ' + quizData.length + '</span></p>' +
+      '<p class="mt-6 text-lg leading-8">' + rating + '</p>' +
+      '<button id="quizRestart" class="mt-8 px-8 py-3 bg-[#26221c] text-[#f6f1e6] rounded shadow hover:bg-black transition">再測一次</button>' +
+    '</div>';
+  document.getElementById('quizRestart').addEventListener('click', function(){
+    qIndex = 0; qScore = 0; renderQuestion();
+  });
+}
+renderQuestion();
+</script>
+</body>
+</html>
